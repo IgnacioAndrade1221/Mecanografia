@@ -26,7 +26,7 @@
 
     const TEXT = `este es un texto default creado por mi por temas
     linguisticos para poder ver que tanto funciona esta monda 
-    dije monda por vaina como la cancion una vaina loca que me lleva
+    dije monda por vaina como la cancion una vaina loca que me lleva 
     a la gloria o algo asi decia`;
 
     let words = []
@@ -36,15 +36,24 @@
     initEvents()
 
     function initGame(){
-        words = TEXT.split(' ').slice(0,32)
+        words = TEXT.split(',').slice(0, 32)
         currentTime= INITIAL_TIME
 
         $time.textContent = currentTime
 
-    }
-    function initEvents(){
+        $paragraph.innerHTML = words.map((word,index) =>{
+             const letters = word.split('')
 
+             return `<word>
+                ${letters
+                    .map(letter => `<letter>${letter}</letter>`)
+                    .join('')
+                }
+                </word>
+                `
+        })
     }
+    function initEvents(){ }
 </script>
 
 </html>
