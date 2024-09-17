@@ -36,7 +36,7 @@
     initEvents()
 
     function initGame(){
-        words = TEXT.split(',').slice(0, 32)
+        words = TEXT.split(' ,').slice(0, 32)
         currentTime= INITIAL_TIME
 
         $time.textContent = currentTime
@@ -51,9 +51,38 @@
                 }
                 </word>
                 `
-        })
+        }).join('')
+
+        const $firstWord = $paragraph.querySelector('word')
+        $firstWord.classList.add('activate')
+        $firstWord.querySelector('letter').classList.add('activate')
+
+        const intervalID = setInterval(() =>{
+            currentTime--
+            $time.textContent = currentTime
+
+            if (currentTime === 0) {
+                clearInterval(intervalID)
+            }
+        }, 1000)
     }
-    function initEvents(){ }
+    function initEvents(){ 
+        document.addEventListener('keydown', () => {
+            $input.focus()
+        })
+        $input.addEventListener('keydown', onKeyDown)
+        $input.addEventListener('keyup', onKeyUp)
+    }
+    
+    function onKeyDown(){
+
+    }
+    function onKeyUp(){
+        
+    }
+    function gameOver(){
+        console.log('Game Over')
+    }
 </script>
 
 </html>
