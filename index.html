@@ -7,14 +7,20 @@
       <p></p>
       <input autofocus>
     </section>
+    <!--
+    game:seccion contiene el juego activo con un temporitzador,
+         un "p" para las palabras y el campo de entrada input
+    input autofocus: campo de entrada se centra automaticamante 
+                     cuando se carga la pagina
+    -->
     <section id="results">
-      <h2>wpm</h2>
+      <h2>Palabras por minuto</h2>
       <h3 id="results-wpm"></h3>
 
-      <h2>accuracy</h2>
+      <h2>% acierto</h2>
       <h3 id="results-accuracy"></h3>
 
-      <button id="reload-button">
+      <button id="reload-button">  <!-- button para reinicial el juego-->
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
           stroke-linecap="round" stroke-linejoin="round">
           <path stroke="none" d="M0 0h24v24H0z" fill="none" />
@@ -25,9 +31,11 @@
     </section>
   </main>
 </body>
-
+<!--
+results: seccion que muestra los resultados al final del juego
+-->
 <script type="module">
-  import { words as INITIAL_WORDS } from './data.js'
+  import { words as INITIAL_WORDS } from './data.js' /* words importa las palabras del archivo data.js*/
 
   const $time = document.querySelector('time');
   const $paragraph = document.querySelector('p');
@@ -37,15 +45,22 @@
   const $wpm = $results.querySelector('#results-wpm')
   const $accuracy = $results.querySelector('#results-accuracy')
   const $button = document.querySelector('#reload-button')
+  /* elementos DOM, variables para facilitar manipulacion */
 
-  const INITIAL_TIME = 30;
+  const INITIAL_TIME = 30;  /* temporizador*/
 
   let words = []
   let currentTime = INITIAL_TIME
   let playing
+  /*
+  words: almacena las palabras actuales del juego
+  currentTime: controla el temporizador
+  playing: indica si el juego esta en curso
+  */
 
   initGame()
   initEvents()
+  /*Inicializan el juego y los eventos de interaccion*/
 
   function initGame() {
     $game.style.display = 'flex'
@@ -72,11 +87,19 @@
       </word>
       `
     }).join('')
-
+    
     const $firstWord = $paragraph.querySelector('word')
     $firstWord.classList.add('active')
     $firstWord.querySelector('letter').classList.add('active')
+    /* Resalta la 1ra palabra y 1ra letra para indicar donde comienza el juego */
   }
+  /*
+  initGame
+  Configura la interfaz para un nuevo juego
+  Funcionalidad: se reinicia a su estado inicial
+  Restaura el juego a su estado inciial y prepara la UI para un nuevo intento
+  linea 79-89 : Estructura de HTMl para que el jugador deba escribir
+  */
 
   function initEvents() {
     document.addEventListener('keydown', () => {
@@ -94,11 +117,20 @@
         }, 1000)
       }
     })
+    
     $input.addEventListener('keydown', onKeyDown)
     $input.addEventListener('keyup', onKeyUp)
     $button.addEventListener('click', initGame)
-
+    /* linea 121-123: Configura los eventos del teclado y clic para 
+       manejar la logica del juego y reiniciarlo
+    */
   }
+/*
+initEvents
+Proposito: configura los eventos del teclado para inicial el juego, manejar la entrada
+de texto y controlar el temporizador.
+Funcion: maneja la interaccion del usuario y el temporizador del juego
+*/
 
   function onKeyDown(event) {
     const $currentWord = $paragraph.querySelector('word.active')
@@ -107,6 +139,10 @@
     const { key } = event
     if (key === ' ') {
       event.preventDefault()
+      /*
+      Controla la logica al presionar teclas especificias como espacio y backspace
+      Navega por las palabras y actualiza la interfaz visual
+      */
 
       const $nextWord = $currentWord.nextElementSibling
       const $nextLetter = $nextWord.querySelector('letter')
@@ -116,6 +152,9 @@
 
       $nextWord.classList.add('active')
       $nextLetter.classList.add('active')
+      /*
+      Actualizar palabra activa: cambia a la siguiente palabra y letra
+      */
 
       $input.value = ''
 
@@ -160,53 +199,81 @@
 
   function onKeyUp() {
     // recuperamos los elementos actuals
-    const $currentWord = $paragraph.querySelector('word.active')
-    const $currentLetter = $currentWord.querySelector('letter.active')
+    const $currentWord = $paragraph.querySelector('word.active') /*Selecciona la palabra activa(la que el usuario esta escribiendo) dentro del parrafo*/
+    const $currentLetter = $currentWord.querySelector('letter.active') /*Selecciona letra activa (la letra actual que el usuario debe escribir) dentro de la palabra activa*/
 
     const currentWord = $currentWord.innerText.trim()
+    /*Extrae el texto de la palabra activa (el texto completo de la palabra) y elimina cualquier espacio en blanco adicional*/
     $input.maxLength = currentWord.length
-
+    /*Establece longitud maxima del campo de entrada a la longitud de la palabra actual
+    Esto evita que el usuario escriba mas caracteres de los necesarios
+    */
     const $allLetters = $currentWord.querySelectorAll('letter')
+    /*Selecciona todas las letras de la palabra activa*/
 
     $allLetters.forEach($letter => $letter.classList.remove('correct', 'incorrect'))
-
-    $input.value.split('').forEach((char, index) => {
+    /*Remueve las clases correct e incorrect de todas las letras para limpiarlas antes de evaluar el nuevo estado*/
+/*
+Proposito: actualiza el estado visual de las letras, mostrando si son correctas o no
+Muestra la entrada del usuario y proporciona la retroalimentacion visual en tiempo real
+*/
+    $input.value.split('').forEach((char, index) => { /*Se recorre cada caracter en el valor actual del input,comparando cada uno con la letra correspondiente de la palabra*/
       const $letter = $allLetters[index]
       const letterToCheck = currentWord[index]
 
-      const isCorrect = char === letterToCheck
-      const letterClass = isCorrect ? 'correct' : 'incorrect'
-      $letter.classList.add(letterClass)
+      const isCorrect = char === letterToCheck/*Compara caracter actual del input (char) con la letra correspondiente de la palabra (lettertoCheck) para verificar si es correcta*/ 
+      const letterClass = isCorrect ? 'correct' : 'incorrect'/*Determina la clase que se debe agregar la letra si es correcta o no*/
+      $letter.classList.add(letterClass) /*Agrega la clase correspondiente para marcar visualmente si es correcta o no*/
     })
+/*
+Verificar letras: compara cada letra escrita con la palabra original
+*/
 
-    $currentLetter.classList.remove('active', 'is-last')
-    const inputLength = $input.value.length
-    const $nextActiveLetter = $allLetters[inputLength]
+    $currentLetter.classList.remove('active', 'is-last')/*Remueve las clases active e is-last de la letra actual para que ya no este destacada como la letra activa*/
+    const inputLength = $input.value.length /*Calcula la longitud del texto escrito en el input*/
+    const $nextActiveLetter = $allLetters[inputLength] /*Determina cual sera la siguiente letra activa basandose en la longitud del input*/
 
     if ($nextActiveLetter) {
       $nextActiveLetter.classList.add('active')
+      /*Si hay una letra siguiente, se le añade la clase active para que sea la nueva letra activa*/
     } else {
       $currentLetter.classList.add('active', 'is-last')
       // TODO: gameover si no hay próxima palabra
     }
   }
+/*
+Maneja la logica del teclado en el juego de mecanografia
+La funcion onKeyUp verifica que cada vez que el usuario suelta una tecla,
+comparando la entrada del usuario con la palabra objetivo y actualizando la
+visualizacion de cada letra para reflejar si esta correcta o incorrecta
+*/ 
 
   function gameOver() {
-    $game.style.display = 'none'
-    $results.style.display = 'flex'
+    $game.style.display = 'none' /*Oculta la seccion del juego cuando el tiempo se ha agotado*/
+    $results.style.display = 'flex' /*Muestra la seccion de resultados con el puntaje obtenido*/
 
-    const correctWords = $paragraph.querySelectorAll('word.correct').length
+    const correctWords = $paragraph.querySelectorAll('word.correct').length 
+    /*Cuenta cuantas palabras completas fueron escritas correctamente*/
     const correctLetter = $paragraph.querySelectorAll('letter.correct').length
+    /*Cuenta cuantas letras fueron escritas en total*/
     const incorrectLetter = $paragraph.querySelectorAll('letter.incorrect').length
-
+    /*Cuenta cuantas letras incorrectas fueron escritas en total*/
     const totalLetters = correctLetter + incorrectLetter
-
+    /*Suma el total de letras escritas*/
     const accuracy = totalLetters > 0
       ? (correctLetter / totalLetters) * 100
       : 0
+    /*Calcula el % de presicion basado en las letras correctas
+    y el total de letras escritas
+    */
 
     const wpm = correctWords * 60 / INITIAL_TIME
+    /*Calcula las palabras por minuto (WPM) dividiendo las palabras
+    correctas por el tiempo inicial (30 segundos)
+    */
     $wpm.textContent = wpm
+    /*Muestra el resultado de palabras por minuto en la seccion de resultados*/
     $accuracy.textContent = `${accuracy.toFixed(2)}%`
+    /*Muestra el % de precision en la seccion de resultados*/
   }
 </script>
